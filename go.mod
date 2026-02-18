@@ -2,7 +2,10 @@ module sample-api-go
 
 go 1.25.6
 
-require github.com/gin-gonic/gin v1.11.0
+require (
+	github.com/gin-gonic/gin v1.11.0
+	github.com/lib/pq v1.11.2
+)
 
 require (
 	github.com/bytedance/sonic v1.14.0 // indirect
