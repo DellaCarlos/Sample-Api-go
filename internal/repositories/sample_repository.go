@@ -3,8 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
-	"sample-api-go/internal/domain/models"
-	"time"
+	"sample-api-go/internal/models"
 )
 
 type SampleRepository struct {
@@ -18,8 +17,7 @@ func NewSampleRepository(connection *sql.DB) SampleRepository {
 	}
 }
 
-func (sr *SampleRepository) GetSample() ([]models.SampleModel, error) {
-
+func (sr *SampleRepository) GetSamples() ([]models.SampleModel, error) {
 	query := "SELECT * FROM samples"
 	rows, err := sr.connection.Query(query)
 	if err != nil {
@@ -55,9 +53,40 @@ func (sr *SampleRepository) GetSample() ([]models.SampleModel, error) {
 	return sampleList, nil
 }
 
+func (sr *SampleRepository) GetProductByID(id_sample int) (*models.SampleModel, error) {
+	query, err := sr.connection.Prepare("SELECT * FROM samples WHERE id = $1")
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	var sample models.SampleModel
+	err = query.QueryRow(id_sample).Scan(
+		&sample.ID,
+		&sample.Name,
+		&sample.Sector,
+		&sample.Analysis,
+		&sample.CreatedByUserID,
+		&sample.CreatedAt,
+		&sample.UpdatedAt,
+		&sample.DeletedAt,
+		&sample.IsActive,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	query.Close()
+	return &sample, nil
+}
+
 func (sr *SampleRepository) CreateSample(sample models.SampleModel) (int, error) {
 	var id int
-	now := time.Now()
 
 	query, err := sr.connection.Prepare(
 		"INSERT INTO samples (name, sector, analysis, created_by_user_id, created_at, updated_at, deleted_at, is_active)" +
@@ -74,10 +103,10 @@ func (sr *SampleRepository) CreateSample(sample models.SampleModel) (int, error)
 		sample.Sector,
 		sample.Analysis,
 		sample.CreatedByUserID,
-		now,  // created_at
-		now,  // updated_at
-		nil,  // deleted_at
-		true, // is_active
+		sample.CreatedAt,
+		sample.UpdatedAt,
+		sample.DeletedAt,
+		sample.IsActive,
 	).Scan(&id)
 
 	if err != nil {

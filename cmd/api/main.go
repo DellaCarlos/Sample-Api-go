@@ -22,6 +22,7 @@ func main() {
 	// camada use-case
 	SampletUseCase := usecase.NewCreateSampleUseCase(SampleRepository)
 	// camada controller
+	// SampleController := controller.NewProductController(SampletUseCase)
 	// endpoinst
 
 	// Define a simple GET endpoint
