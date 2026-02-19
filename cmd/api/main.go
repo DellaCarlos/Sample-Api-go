@@ -2,13 +2,27 @@ package main
 
 import (
 	"net/http"
+	"sample-api-go/internal/database"
+	"sample-api-go/internal/repositories"
+	usecase "sample-api-go/internal/use-case"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// Create a Gin router with default middleware (logger and recovery)
 	r := gin.Default()
+
+	dbConnection, err := database.ConnectDB()
+	if err != nil {
+		panic(err)
+	}
+
+	// camada repo
+	SampleRepository := repositories.NewSampleRepository(dbConnection)
+	// camada use-case
+	SampletUseCase := usecase.NewCreateSampleUseCase(SampleRepository)
+	// camada controller
+	// endpoinst
 
 	// Define a simple GET endpoint
 	r.GET("/ping", func(c *gin.Context) {
@@ -17,8 +31,6 @@ func main() {
 			"message": "pong",
 		})
 	})
-
-	SamplesRoutes(r) // rotas para acesso ada Api de amostras
 
 	// Start server on port 8080 (default)
 	// Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)
