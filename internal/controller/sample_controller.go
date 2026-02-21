@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 	"sample-api-go/internal/models"
-	usecase "sample-api-go/internal/use-case"
+	usecase "sample-api-go/internal/usecase"
 	"strconv"
 
 	"github.com/gin-gonic/gin"

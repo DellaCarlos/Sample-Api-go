@@ -1,10 +1,10 @@
 package main
 
 import (
-	"sample-api-go/internal/controllers"
+	controllers "sample-api-go/internal/controller"
 	"sample-api-go/internal/database"
 	"sample-api-go/internal/repositories"
-	usecase "sample-api-go/internal/use-case"
+	usecase "sample-api-go/internal/usecase"
 
 	"github.com/gin-gonic/gin"
 )
