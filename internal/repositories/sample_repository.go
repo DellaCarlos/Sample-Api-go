@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"sample-api-go/internal/models"
+
+	"github.com/lib/pq"
 )
 
 type SampleRepository struct {
@@ -18,7 +20,20 @@ func NewSampleRepository(connection *sql.DB) SampleRepository {
 }
 
 func (sr *SampleRepository) GetSamples() ([]models.SampleModel, error) {
-	query := "SELECT * FROM samples"
+	query := `
+		SELECT 
+			id_sample,
+			name_sample,
+			sector_sample,
+			analysis_sample,
+			created_by_user_id_sample,
+			created_at_sample,
+			updated_at_sample,
+			deleted_at_sample,
+			is_active_sample
+		FROM samples
+	`
+
 	rows, err := sr.connection.Query(query)
 	if err != nil {
 		fmt.Println(err)
@@ -33,7 +48,7 @@ func (sr *SampleRepository) GetSamples() ([]models.SampleModel, error) {
 			&sampleObj.ID,
 			&sampleObj.Name,
 			&sampleObj.Sector,
-			&sampleObj.Analysis,
+			pq.Array(&sampleObj.Analysis),
 			&sampleObj.CreatedByUserID,
 			&sampleObj.CreatedAt,
 			&sampleObj.UpdatedAt,
@@ -89,8 +104,9 @@ func (sr *SampleRepository) CreateSample(sample models.SampleModel) (int, error)
 	var id int
 
 	query, err := sr.connection.Prepare(
-		"INSERT INTO samples (name, sector, analysis, created_by_user_id, created_at, updated_at, deleted_at, is_active)" +
-			" VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
+		"INSERT INTO samples (" +
+			"name_sample, sector_sample, analysis_sample, created_by_user_id_sample, created_at_sample, updated_at_sample, deleted_at_sample, is_active_sample" +
+			") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id_sample",
 	)
 
 	if err != nil {

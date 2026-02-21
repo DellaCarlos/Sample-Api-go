@@ -9,7 +9,7 @@ type SampleModel struct {
 	Name            string     `json:"name_sample"`
 	Sector          string     `json:"sector_sample"`
 	Analysis        []string   `json:"analysis_sample"`
-	CreatedByUserID int        `json:"created_by_user_id_sample"`
+	CreatedByUserID string     `json:"created_by_user_id_sample"`
 	CreatedAt       time.Time  `json:"created_at_sample"`
 	UpdatedAt       time.Time  `json:"updated_at_sample"`
 	DeletedAt       *time.Time `json:"deleted_at_sample,omitempty"`
