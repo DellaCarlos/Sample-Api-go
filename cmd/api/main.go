@@ -1,7 +1,7 @@
 package main
 
 import (
-	"net/http"
+	"sample-api-go/internal/controllers"
 	"sample-api-go/internal/database"
 	"sample-api-go/internal/repositories"
 	usecase "sample-api-go/internal/use-case"
@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	r := gin.Default()
+	server := gin.Default()
 
 	dbConnection, err := database.ConnectDB()
 	if err != nil {
@@ -22,18 +22,14 @@ func main() {
 	// camada use-case
 	SampletUseCase := usecase.NewCreateSampleUseCase(SampleRepository)
 	// camada controller
-	// SampleController := controller.NewProductController(SampletUseCase)
-	// endpoinst
+	SampleController := controllers.NewSampleController(SampletUseCase)
 
-	// Define a simple GET endpoint
-	r.GET("/ping", func(c *gin.Context) {
-		// Return JSON response
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+	// endpoinst
+	server.GET("/samples", SampleController.GetSamples)
+	server.GET("/samples/:sampleId", SampleController.GetSampleByID)
+	server.POST("/sample", SampleController.CreateSample)
 
 	// Start server on port 8080 (default)
 	// Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)
-	r.Run()
+	server.Run()
 }

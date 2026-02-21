@@ -1,5 +1,5 @@
 package models
 
 type ResponseModel struct {
-	Status string
+	Message string
 }
