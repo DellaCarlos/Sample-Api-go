@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"sample-api-go/internal/models"
+	"time"
 
 	"github.com/lib/pq"
 )
@@ -69,7 +70,20 @@ func (sr *SampleRepository) GetSamples() ([]models.SampleModel, error) {
 }
 
 func (sr *SampleRepository) GetProductByID(id_sample int) (*models.SampleModel, error) {
-	query, err := sr.connection.Prepare("SELECT * FROM samples WHERE id = $1")
+	query, err := sr.connection.Prepare(`
+	SELECT id_sample,
+		name_sample,
+		sector_sample,
+		analysis_sample,
+		created_by_user_id_sample,
+		created_at_sample,
+		updated_at_sample,
+		deleted_at_sample,
+		is_active_sample
+	FROM samples
+	WHERE id_sample = $1
+	`)
+
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -80,7 +94,7 @@ func (sr *SampleRepository) GetProductByID(id_sample int) (*models.SampleModel, 
 		&sample.ID,
 		&sample.Name,
 		&sample.Sector,
-		&sample.Analysis,
+		pq.Array(&sample.Analysis),
 		&sample.CreatedByUserID,
 		&sample.CreatedAt,
 		&sample.UpdatedAt,
@@ -101,6 +115,7 @@ func (sr *SampleRepository) GetProductByID(id_sample int) (*models.SampleModel, 
 }
 
 func (sr *SampleRepository) CreateSample(sample models.SampleModel) (int, error) {
+	now := time.Now() // tempo do momento para criar a amostra
 	var id int
 
 	query, err := sr.connection.Prepare(
@@ -119,10 +134,10 @@ func (sr *SampleRepository) CreateSample(sample models.SampleModel) (int, error)
 		sample.Sector,
 		sample.Analysis,
 		sample.CreatedByUserID,
-		sample.CreatedAt,
-		sample.UpdatedAt,
-		sample.DeletedAt,
-		sample.IsActive,
+		now,  // created_at_sample
+		now,  // updated_at_sample
+		nil,  // deleted_at_sample
+		true, // is_active_sample
 	).Scan(&id)
 
 	if err != nil {
@@ -132,4 +147,27 @@ func (sr *SampleRepository) CreateSample(sample models.SampleModel) (int, error)
 
 	query.Close()
 	return id, nil
+}
+
+// Deletar sample by ID
+func (sr *SampleRepository) SoftDeleteSampleByID(id_sample int) error {
+	query := `
+		UPDATE samples
+		SET deleted_at_sample = $1,
+		    is_active_sample = false
+		WHERE id_sample = $2
+		  AND is_active_sample = true
+	`
+
+	result, err := sr.connection.Exec(query, time.Now(), id_sample)
+	if err != nil {
+		return err
+	}
+
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return fmt.Errorf("sample não encontrado (del)")
+	}
+
+	return nil
 }

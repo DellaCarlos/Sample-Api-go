@@ -3,7 +3,6 @@ package usecase
 import (
 	"sample-api-go/internal/models"
 	"sample-api-go/internal/repositories"
-	"time"
 )
 
 type SampleUseCase struct {
@@ -30,19 +29,21 @@ func (su *SampleUseCase) GetSampleByID(id_sample int) (*models.SampleModel, erro
 }
 
 func (su *SampleUseCase) CreateSample(sample models.SampleModel) (models.SampleModel, error) {
-
-	now := time.Now() // tempo do momento para criar a amostra
-
 	sampleId, err := su.Repository.CreateSample(sample)
 	if err != nil {
 		return models.SampleModel{}, err
 	}
 
 	sample.ID = sampleId
-	sample.CreatedAt = now
-	sample.UpdatedAt = now
-	sample.DeletedAt = nil
-	sample.IsActive = true
 
 	return sample, nil
+}
+
+func (su *SampleUseCase) SoftDeleteSampleByID(id_sample int) error {
+	err := su.Repository.SoftDeleteSampleByID(id_sample)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

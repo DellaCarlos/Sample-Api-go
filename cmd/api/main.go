@@ -17,19 +17,16 @@ func main() {
 		panic(err)
 	}
 
-	// camada repo
-	SampleRepository := repositories.NewSampleRepository(dbConnection)
-	// camada use-case
-	SampletUseCase := usecase.NewCreateSampleUseCase(SampleRepository)
-	// camada controller
-	SampleController := controllers.NewSampleController(SampletUseCase)
+	SampleRepository := repositories.NewSampleRepository(dbConnection)  // camada repo
+	SampletUseCase := usecase.NewCreateSampleUseCase(SampleRepository)  // camada use-case
+	SampleController := controllers.NewSampleController(SampletUseCase) // camada controller
 
 	// endpoinst
 	server.GET("/samples", SampleController.GetSamples)
-	server.GET("/samples/:sampleId", SampleController.GetSampleByID)
+	server.GET("/samples/:id_sample", SampleController.GetSampleByID)
 	server.POST("/sample", SampleController.CreateSample)
+	server.DELETE("/sample/:id_sample", SampleController.SoftDeleteSampleByID)
 
 	// Start server on port 8080 (default)
-	// Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)
 	server.Run()
 }

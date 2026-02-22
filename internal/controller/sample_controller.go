@@ -31,7 +31,7 @@ func (s *sampleController) GetSamples(ctx *gin.Context) {
 
 // função que trata a requisição de obtenção de produtos (get)
 func (s *sampleController) GetSampleByID(ctx *gin.Context) {
-	id := ctx.Param("sampleId")
+	id := ctx.Param("id_sample")
 	if id == "" {
 		response := models.ResponseModel{
 			Message: "Id não pode ser null",
@@ -81,5 +81,33 @@ func (s *sampleController) CreateSample(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, insertedSample)
+	ctx.JSON(http.StatusCreated, models.ResponseModel{Message: strconv.Itoa(insertedSample.ID)})
+}
+
+func (s *sampleController) SoftDeleteSampleByID(ctx *gin.Context) {
+	id := ctx.Param("id_sample")
+	if id == "" {
+		response := models.ResponseModel{
+			Message: "Id não pode ser null (del)",
+		}
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	sampleId, err := strconv.Atoi(id)
+	if err != nil {
+		response := models.ResponseModel{
+			Message: "Id precisa ser um número inteiro (del)",
+		}
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err = s.sampleUseCase.SoftDeleteSampleByID(sampleId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, nil)
 }
