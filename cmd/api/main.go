@@ -21,7 +21,7 @@ func main() {
 	SampletUseCase := usecase.NewCreateSampleUseCase(SampleRepository)  // camada use-case
 	SampleController := controllers.NewSampleController(SampletUseCase) // camada controller
 
-	// endpoinst
+	// endpoinst.
 	server.GET("/samples", SampleController.GetSamples)
 	server.GET("/samples/:id_sample", SampleController.GetSampleByID)
 	server.POST("/sample", SampleController.CreateSample)
