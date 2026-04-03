@@ -25,7 +25,7 @@ func main() {
 	server.GET("/samples", SampleController.GetSamples)
 	server.GET("/samples/:id_sample", SampleController.GetSampleByID)
 	server.POST("/sample", SampleController.CreateSample)
-	server.DELETE("/sample/:id_sample", SampleController.SoftDeleteSampleByID)
+	server.DELETE("/sampledelete/:id_sample", SampleController.SoftDeleteSampleByID)
 
 	// Start server on port 8080 (default)
 	server.Run()

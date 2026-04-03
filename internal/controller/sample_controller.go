@@ -81,7 +81,7 @@ func (s *sampleController) CreateSample(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, models.ResponseModel{Message: strconv.Itoa(insertedSample.ID)})
+	ctx.JSON(http.StatusCreated, models.ResponseModel{Message: "Created id " + strconv.Itoa(insertedSample.ID)})
 }
 
 func (s *sampleController) SoftDeleteSampleByID(ctx *gin.Context) {
@@ -109,5 +109,5 @@ func (s *sampleController) SoftDeleteSampleByID(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, nil)
+	ctx.JSON(http.StatusOK, models.ResponseModel{Message: "Desativado"})
 }
