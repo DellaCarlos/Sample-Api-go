@@ -1,4 +1,12 @@
 services:
+  go-sample:
+    container_name: go-sample
+    image: samplelims-api
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - go_sample_db
   go_sample_db:
     container_name: go_sample_db
     image: postgres:12

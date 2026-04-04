@@ -9,18 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type sampleController struct {
+type SampleController struct {
 	sampleUseCase usecase.SampleUseCase
 }
 
-func NewSampleController(usecase usecase.SampleUseCase) sampleController {
-	return sampleController{
+func NewSampleController(usecase usecase.SampleUseCase) *SampleController {
+	return &SampleController{
 		sampleUseCase: usecase,
 	}
 }
 
 // função que trata a requisição de obtenção de produtos (get)
-func (s *sampleController) GetSamples(ctx *gin.Context) {
+func (s *SampleController) GetSamples(ctx *gin.Context) {
 	samples, err := s.sampleUseCase.GetSamples()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
@@ -30,7 +30,7 @@ func (s *sampleController) GetSamples(ctx *gin.Context) {
 }
 
 // função que trata a requisição de obtenção de produtos (get)
-func (s *sampleController) GetSampleByID(ctx *gin.Context) {
+func (s *SampleController) GetSampleByID(ctx *gin.Context) {
 	id := ctx.Param("id_sample")
 	if id == "" {
 		response := models.ResponseModel{
@@ -67,7 +67,7 @@ func (s *sampleController) GetSampleByID(ctx *gin.Context) {
 }
 
 // função que trata a requisição de criação de produto (post)
-func (s *sampleController) CreateSample(ctx *gin.Context) {
+func (s *SampleController) CreateSample(ctx *gin.Context) {
 	var sample models.SampleModel
 	err := ctx.BindJSON(&sample)
 	if err != nil {
@@ -84,7 +84,7 @@ func (s *sampleController) CreateSample(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, models.ResponseModel{Message: "Created id " + strconv.Itoa(insertedSample.ID)})
 }
 
-func (s *sampleController) SoftDeleteSampleByID(ctx *gin.Context) {
+func (s *SampleController) SoftDeleteSampleByID(ctx *gin.Context) {
 	id := ctx.Param("id_sample")
 	if id == "" {
 		response := models.ResponseModel{

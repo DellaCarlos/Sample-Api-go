@@ -1,9 +1,11 @@
 package main
 
 import (
+	"log"
 	controllers "sample-api-go/internal/controller"
 	"sample-api-go/internal/database"
 	"sample-api-go/internal/repositories"
+	"sample-api-go/internal/routes"
 	usecase "sample-api-go/internal/usecase"
 
 	"github.com/gin-contrib/cors"
@@ -22,17 +24,16 @@ func main() {
 
 	dbConnection, err := database.ConnectDB()
 	if err != nil {
-		panic(err)
+		log.Fatalf("erro ao conectar no banco: %v", err)
 	}
 
-	SampleRepository := repositories.NewSampleRepository(dbConnection)
-	SampletUseCase := usecase.NewCreateSampleUseCase(SampleRepository)
-	SampleController := controllers.NewSampleController(SampletUseCase)
+	sampleRepository := repositories.NewSampleRepository(dbConnection)
+	sampleUseCase := usecase.NewCreateSampleUseCase(sampleRepository)
+	sampleController := controllers.NewSampleController(sampleUseCase)
 
-	server.GET("/samples", SampleController.GetSamples)
-	server.GET("/samples/:id_sample", SampleController.GetSampleByID)
-	server.POST("/sample", SampleController.CreateSample)
-	server.DELETE("/sampledelete/:id_sample", SampleController.SoftDeleteSampleByID)
+	routes.Register(server, sampleController)
 
-	server.Run()
+	if err := server.Run(":8000"); err != nil {
+		log.Fatalf("erro ao iniciar servidor: %v", err)
+	}
 }
