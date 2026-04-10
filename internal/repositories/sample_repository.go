@@ -13,7 +13,8 @@ type SampleRepository struct {
 	connection *sql.DB
 }
 
-// NewSampleRepository creates a new instance of SampleRepository with the provided database connection
+// NewSampleRepository creates a new instance of SampleRepository
+// with the provided database connection
 func NewSampleRepository(connection *sql.DB) SampleRepository {
 	return SampleRepository{
 		connection: connection,

@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 // SampleModel is a struct that represents a sample data model
 
