@@ -31,7 +31,12 @@ func main() {
 	sampleUseCase := usecase.NewCreateSampleUseCase(sampleRepository)
 	sampleController := controllers.NewSampleController(sampleUseCase)
 
-	routes.Register(server, sampleController)
+	// Sectors
+	sectorRepository := repositories.NewSectorRepository(dbConnection)
+	sectorUseCase := usecase.NewSectorUseCase(sectorRepository)
+	sectorController := controllers.NewSectorController(sectorUseCase)
+
+	routes.Register(server, sampleController, sectorController)
 
 	if err := server.Run(":8000"); err != nil {
 		log.Fatalf("erro ao iniciar servidor: %v", err)

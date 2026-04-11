@@ -48,24 +48,20 @@ func (scr *SectorRepository) GetSectors() ([]models.SectorModel, error) {
 }
 
 func (scr *SectorRepository) CreateSector(sector models.SectorModel) (uuid.UUID, error) {
-	var id uuid.UUID
-
+	id := uuid.New()
 	query, err := scr.connection.Prepare(
-		"INSERT INTO sector name VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id_sample",
+		"INSERT INTO sectors (id_sector, name) VALUES ($1, $2)",
 	)
 
 	if err != nil {
 		return uuid.Nil, err
 	}
+	defer query.Close()
 
-	err = query.QueryRow(
-		sector.Sector,
-	).Scan(&id)
-
+	_, err = query.Exec(id, sector.Sector)
 	if err != nil {
 		return uuid.Nil, err
 	}
 
-	query.Close()
-	return id, err
+	return id, nil
 }

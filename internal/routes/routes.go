@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Register(server *gin.Engine, sampleController *controllers.SampleController) {
+func Register(server *gin.Engine, sampleController *controllers.SampleController, sectorController *controllers.SectorController) {
 	v1 := server.Group("/api/v1")
 	{
 		samples := v1.Group("/samples")
@@ -15,6 +15,12 @@ func Register(server *gin.Engine, sampleController *controllers.SampleController
 			samples.GET("/:id_sample", sampleController.GetSampleByID)
 			samples.POST("", sampleController.CreateSample)
 			samples.DELETE("/:id_sample", sampleController.SoftDeleteSampleByID)
+		}
+
+		sectors := v1.Group("/sectors")
+		{
+			sectors.GET("", sectorController.GetSector)
+			sectors.POST("", sectorController.CreateSector)
 		}
 	}
 }
