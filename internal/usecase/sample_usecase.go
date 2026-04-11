@@ -20,7 +20,7 @@ func (su *SampleUseCase) GetSamples() ([]models.SampleModel, error) {
 }
 
 func (su *SampleUseCase) GetSampleByID(id_sample int) (*models.SampleModel, error) {
-	sample, err := su.Repository.GetProductByID(id_sample)
+	sample, err := su.Repository.GetSampleByID(id_sample)
 	if err != nil {
 		return nil, err
 	}

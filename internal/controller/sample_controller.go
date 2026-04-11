@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	apperrors "sample-api-go/internal/errors"
 	"sample-api-go/internal/models"
 	usecase "sample-api-go/internal/usecase"
 	"strconv"
@@ -33,19 +35,14 @@ func (s *SampleController) GetSamples(ctx *gin.Context) {
 func (s *SampleController) GetSampleByID(ctx *gin.Context) {
 	id := ctx.Param("id_sample")
 	if id == "" {
-		response := models.ResponseModel{
-			Message: "Id não pode ser null",
-		}
+		response := models.ResponseModel{Message: "Id não pode ser null"}
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	sampleId, err := strconv.Atoi(id)
 	if err != nil {
-		response := models.ResponseModel{
-			Message: "Id precisa ser um número inteiro",
-		}
-		ctx.JSON(http.StatusBadRequest, response)
+		ctx.JSON(http.StatusBadRequest, apperrors.BadRequest("id not valid"))
 		return
 	}
 
@@ -56,10 +53,7 @@ func (s *SampleController) GetSampleByID(ctx *gin.Context) {
 	}
 
 	if sample == nil {
-		response := models.ResponseModel{
-			Message: "Produto não encontrado",
-		}
-		ctx.JSON(http.StatusNotFound, response)
+		ctx.JSON(http.StatusNotFound, apperrors.NotFound(fmt.Sprintf("sample with id %s not found", id)))
 		return
 	}
 

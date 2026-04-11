@@ -2,7 +2,9 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	apperrors "sample-api-go/internal/errors"
 	"sample-api-go/internal/models"
 	"time"
 
@@ -70,7 +72,7 @@ func (sr *SampleRepository) GetSamples() ([]models.SampleModel, error) {
 	return sampleList, nil
 }
 
-func (sr *SampleRepository) GetProductByID(id_sample int) (*models.SampleModel, error) {
+func (sr *SampleRepository) GetSampleByID(id_sample int) (*models.SampleModel, error) {
 	query, err := sr.connection.Prepare(`
 	SELECT id_sample,
 		name_sample,
@@ -84,11 +86,11 @@ func (sr *SampleRepository) GetProductByID(id_sample int) (*models.SampleModel, 
 	FROM samples
 	WHERE id_sample = $1
 	`)
-
 	if err != nil {
 		fmt.Println(err)
-		return nil, err
+		return nil, apperrors.Internal("faild to prepare query")
 	}
+	defer query.Close()
 
 	var sample models.SampleModel
 	err = query.QueryRow(id_sample).Scan(
@@ -104,14 +106,12 @@ func (sr *SampleRepository) GetProductByID(id_sample int) (*models.SampleModel, 
 	)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, apperrors.NotFound("sample not found")
 		}
-
-		return nil, err
+		return nil, apperrors.Internal("failed to scan sample")
 	}
 
-	query.Close()
 	return &sample, nil
 }
 
@@ -135,10 +135,10 @@ func (sr *SampleRepository) CreateSample(sample models.SampleModel) (int, error)
 		sample.Sector,
 		sample.Analysis,
 		sample.CreatedByUserID,
-		now,  // created_at_sample
-		now,  // updated_at_sample
-		nil,  // deleted_at_sample
-		true, // is_active_sample
+		now,
+		now,
+		nil,
+		true,
 	).Scan(&id)
 
 	if err != nil {
@@ -150,7 +150,6 @@ func (sr *SampleRepository) CreateSample(sample models.SampleModel) (int, error)
 	return id, nil
 }
 
-// Deletar sample by ID
 func (sr *SampleRepository) SoftDeleteSampleByID(id_sample int) error {
 	query := `
 		UPDATE samples
