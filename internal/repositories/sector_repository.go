@@ -20,7 +20,7 @@ func NewSectorRepository(connection *sql.DB) SectorRepository {
 }
 
 func (scr *SectorRepository) GetSectors() ([]models.SectorModel, error) {
-	query := "SELECT id_sector, name FROM sectors"
+	query := "SELECT id_sector, sector_id, sector_name FROM sectors"
 
 	rows, err := scr.connection.Query(query)
 	if err != nil {
@@ -33,6 +33,7 @@ func (scr *SectorRepository) GetSectors() ([]models.SectorModel, error) {
 	for rows.Next() {
 		err = rows.Scan(
 			&sectorObj.ID,
+			&sectorObj.SectorID,
 			&sectorObj.Sector,
 		)
 
@@ -50,9 +51,8 @@ func (scr *SectorRepository) GetSectors() ([]models.SectorModel, error) {
 func (scr *SectorRepository) CreateSector(sector models.SectorModel) (uuid.UUID, error) {
 	id := uuid.New()
 	query, err := scr.connection.Prepare(
-		"INSERT INTO sectors (id_sector, name) VALUES ($1, $2)",
+		"INSERT INTO sectors (id_sector, sector_name) VALUES ($1, $2)",
 	)
-
 	if err != nil {
 		return uuid.Nil, err
 	}

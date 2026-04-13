@@ -40,7 +40,6 @@ func (sr *SampleRepository) GetSamples() ([]models.SampleModel, error) {
 
 	rows, err := sr.connection.Query(query)
 	if err != nil {
-		fmt.Println(err)
 		return []models.SampleModel{}, err
 	}
 
@@ -61,7 +60,6 @@ func (sr *SampleRepository) GetSamples() ([]models.SampleModel, error) {
 		)
 
 		if err != nil {
-			fmt.Println(err)
 			return []models.SampleModel{}, err
 		}
 
@@ -87,7 +85,6 @@ func (sr *SampleRepository) GetSampleByID(id_sample int) (*models.SampleModel, e
 	WHERE id_sample = $1
 	`)
 	if err != nil {
-		fmt.Println(err)
 		return nil, apperrors.Internal("faild to prepare query")
 	}
 	defer query.Close()
@@ -116,7 +113,7 @@ func (sr *SampleRepository) GetSampleByID(id_sample int) (*models.SampleModel, e
 }
 
 func (sr *SampleRepository) CreateSample(sample models.SampleModel) (int, error) {
-	now := time.Now() // tempo do momento para criar a amostra
+	now := time.Now()
 	var id int
 
 	query, err := sr.connection.Prepare(
@@ -126,7 +123,6 @@ func (sr *SampleRepository) CreateSample(sample models.SampleModel) (int, error)
 	)
 
 	if err != nil {
-		fmt.Println(err)
 		return 0, err
 	}
 
@@ -142,7 +138,6 @@ func (sr *SampleRepository) CreateSample(sample models.SampleModel) (int, error)
 	).Scan(&id)
 
 	if err != nil {
-		fmt.Println(err)
 		return 0, err
 	}
 
@@ -161,12 +156,13 @@ func (sr *SampleRepository) SoftDeleteSampleByID(id_sample int) error {
 
 	result, err := sr.connection.Exec(query, time.Now(), id_sample)
 	if err != nil {
+		fmt.Println("erro aqui")
 		return err
 	}
 
 	rows, _ := result.RowsAffected()
 	if rows == 0 {
-		return fmt.Errorf("sample não encontrado (del)")
+		return apperrors.NotFound("id sample not found")
 	}
 
 	return nil

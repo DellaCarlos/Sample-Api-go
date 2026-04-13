@@ -3,6 +3,9 @@ package usecase
 import (
 	"sample-api-go/internal/models"
 	"sample-api-go/internal/repositories"
+	"strings"
+
+	apperrors "sample-api-go/internal/errors"
 )
 
 type SectorUseCase struct {
@@ -20,12 +23,16 @@ func (scu *SectorUseCase) GetSectors() ([]models.SectorModel, error) {
 }
 
 func (scu *SectorUseCase) CreateSector(sector models.SectorModel) (models.SectorModel, error) {
-	idSector, err := scu.Repository.CreateSector(sector)
+	if strings.TrimSpace(sector.Sector) == "" {
+		return sector, apperrors.BadRequest("invalid sector.")
+	}
+
+	id, err := scu.Repository.CreateSector(sector)
 	if err != nil {
 		return models.SectorModel{}, err
 	}
 
-	sector.ID = idSector
+	sector.ID = id
 
 	return sector, nil
 }

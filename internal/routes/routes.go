@@ -14,7 +14,7 @@ func Register(server *gin.Engine, sampleController *controllers.SampleController
 			samples.GET("", sampleController.GetSamples)
 			samples.GET("/:id_sample", sampleController.GetSampleByID)
 			samples.POST("", sampleController.CreateSample)
-			samples.DELETE("/:id_sample", sampleController.SoftDeleteSampleByID)
+			samples.DELETE("/d/:id_sample", sampleController.SoftDeleteSampleByID)
 		}
 
 		sectors := v1.Group("/sectors")

@@ -5,7 +5,6 @@ import (
 )
 
 // SampleModel is a struct that represents a sample data model
-
 type SampleModel struct {
 	ID              int        `json:"id_sample"`
 	Name            string     `json:"name_sample"`

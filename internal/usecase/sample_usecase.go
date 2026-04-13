@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	apperrors "sample-api-go/internal/errors"
 	"sample-api-go/internal/models"
 	"sample-api-go/internal/repositories"
 )
@@ -42,8 +43,7 @@ func (su *SampleUseCase) CreateSample(sample models.SampleModel) (models.SampleM
 func (su *SampleUseCase) SoftDeleteSampleByID(id_sample int) error {
 	err := su.Repository.SoftDeleteSampleByID(id_sample)
 	if err != nil {
-		return err
+		return apperrors.Internal("invalid id")
 	}
-
 	return nil
 }

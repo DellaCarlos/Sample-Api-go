@@ -80,20 +80,15 @@ func (s *SampleController) CreateSample(ctx *gin.Context) {
 
 func (s *SampleController) SoftDeleteSampleByID(ctx *gin.Context) {
 	id := ctx.Param("id_sample")
+
 	if id == "" {
-		response := models.ResponseModel{
-			Message: "Id não pode ser null (del)",
-		}
-		ctx.JSON(http.StatusBadRequest, response)
+		ctx.JSON(http.StatusBadRequest, apperrors.BadRequest("invalid id, must be not null"))
 		return
 	}
 
 	sampleId, err := strconv.Atoi(id)
 	if err != nil {
-		response := models.ResponseModel{
-			Message: "Id precisa ser um número inteiro (del)",
-		}
-		ctx.JSON(http.StatusBadRequest, response)
+		ctx.JSON(http.StatusBadRequest, apperrors.BadRequest("invalid id, must not be char"))
 		return
 	}
 
@@ -103,5 +98,5 @@ func (s *SampleController) SoftDeleteSampleByID(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, models.ResponseModel{Message: "Desativado"})
+	ctx.JSON(http.StatusOK, models.ResponseModel{Message: "Desativado " + id})
 }

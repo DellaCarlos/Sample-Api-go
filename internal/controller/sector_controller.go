@@ -41,5 +41,5 @@ func (sc *SectorController) CreateSector(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, models.ResponseModel{Message: "Created: " + insertedSector.Sector})
+	ctx.JSON(http.StatusCreated, models.ResponseModel{Message: "Sector created: " + insertedSector.Sector})
 }
