@@ -98,5 +98,28 @@ func (s *SampleController) SoftDeleteSampleByID(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, models.ResponseModel{Message: "Desativado " + id})
+	ctx.JSON(http.StatusOK, models.ResponseModel{Message: "disabled: " + id})
+}
+
+func (s *SampleController) HardDeleteSampleByID(ctx *gin.Context) {
+	id := ctx.Param("id_sample")
+
+	if id == "" {
+		ctx.JSON(http.StatusBadRequest, apperrors.BadRequest("invalid id, must be not null"))
+		return
+	}
+
+	removeId, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, apperrors.BadRequest("invalid id, must not be char"))
+		return
+	}
+
+	err = s.sampleUseCase.HardDeleteSampleByID(removeId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, models.ResponseModel{Message: "removed " + id})
 }

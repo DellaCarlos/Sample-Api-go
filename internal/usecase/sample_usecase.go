@@ -47,3 +47,11 @@ func (su *SampleUseCase) SoftDeleteSampleByID(id_sample int) error {
 	}
 	return nil
 }
+
+func (su *SampleUseCase) HardDeleteSampleByID(id_sample int) error {
+	err := su.Repository.HardDeleteSampleByID(id_sample)
+	if err != nil {
+		return apperrors.Internal("invalid id")
+	}
+	return nil
+}

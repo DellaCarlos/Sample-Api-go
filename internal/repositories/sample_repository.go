@@ -162,7 +162,26 @@ func (sr *SampleRepository) SoftDeleteSampleByID(id_sample int) error {
 
 	rows, _ := result.RowsAffected()
 	if rows == 0 {
-		return apperrors.NotFound("id sample not found")
+		return apperrors.NotFound("sample not found")
+	}
+
+	return nil
+}
+
+func (sr *SampleRepository) HardDeleteSampleByID(id_sample int) error {
+	query := `
+        DELETE FROM samples
+        WHERE id_sample = $1
+    `
+
+	result, err := sr.connection.Exec(query, id_sample)
+	if err != nil {
+		return err
+	}
+
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return apperrors.NotFound("sample not found")
 	}
 
 	return nil
