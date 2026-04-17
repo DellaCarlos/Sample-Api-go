@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	apperrors "sample-api-go/internal/errors"
 	"sample-api-go/internal/models"
 
 	"github.com/google/uuid"
@@ -64,4 +65,23 @@ func (scr *SectorRepository) CreateSector(sector models.SectorModel) (uuid.UUID,
 	}
 
 	return id, nil
+}
+
+func (scr *SectorRepository) DeleteSector(id_sector uuid.UUID) error {
+	query := `
+	DELETE FROM sectors
+	WHERE id_sector = $1
+    `
+
+	result, err := scr.connection.Exec(query, id_sector)
+	if err != nil {
+		return err
+	}
+
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return apperrors.NotFound("sector not found")
+	}
+
+	return nil
 }

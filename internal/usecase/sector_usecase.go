@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	apperrors "sample-api-go/internal/errors"
+
+	"github.com/google/uuid"
 )
 
 type SectorUseCase struct {
@@ -35,4 +37,12 @@ func (scu *SectorUseCase) CreateSector(sector models.SectorModel) (models.Sector
 	sector.ID = id
 
 	return sector, nil
+}
+
+func (scu *SectorUseCase) DeleteSector(id_sector uuid.UUID) error {
+	err := scu.Repository.DeleteSector(id_sector)
+	if err != nil {
+		return apperrors.Internal("invalid id")
+	}
+	return nil
 }

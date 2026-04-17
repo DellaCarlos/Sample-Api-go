@@ -22,6 +22,7 @@ func Register(server *gin.Engine, sampleController *controllers.SampleController
 		{
 			sectors.GET("", sectorController.GetSector)
 			sectors.POST("", sectorController.CreateSector)
+			sectors.DELETE("/hd/:id_sector", sectorController.DeleteSector)
 		}
 	}
 }
