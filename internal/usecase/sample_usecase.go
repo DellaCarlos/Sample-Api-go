@@ -4,6 +4,7 @@ import (
 	apperrors "sample-api-go/internal/errors"
 	"sample-api-go/internal/models"
 	"sample-api-go/internal/repositories"
+	"time"
 )
 
 type SampleUseCase struct {
@@ -54,4 +55,20 @@ func (su *SampleUseCase) HardDeleteSampleByID(id_sample int) error {
 		return apperrors.Internal("invalid id")
 	}
 	return nil
+}
+
+func (su *SampleUseCase) UpdateSample(id_sample int, input map[string]interface{}) (*models.SampleModel, error) {
+	if isActive, ok := input["is_active_sample"]; ok {
+		if isActive == false {
+			input["deleted_at_sample"] = time.Now()
+		} else {
+			input["deleted_at_sample"] = nil
+		}
+	}
+
+	sample, err := su.Repository.UpdateSample(id_sample, input)
+	if err != nil {
+		return nil, err
+	}
+	return sample, nil
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	apperrors "sample-api-go/internal/errors"
 	"sample-api-go/internal/models"
+	"strings"
 	"time"
 
 	"github.com/lib/pq"
@@ -185,4 +186,79 @@ func (sr *SampleRepository) HardDeleteSampleByID(id_sample int) error {
 	}
 
 	return nil
+}
+
+func (sr *SampleRepository) UpdateSample(id_sample int, input map[string]interface{}) (*models.SampleModel, error) {
+	setClauses := []string{}
+	args := []interface{}{}
+	argIdx := 1
+
+	fieldMap := map[string]string{
+		"name_sample":       "name_sample",
+		"sector_sample":     "sector_sample",
+		"analysis_sample":   "analysis_sample",
+		"is_active_sample":  "is_active_sample",
+		"deleted_at_sample": "deleted_at_sample",
+	}
+
+	for jsonKey, dbCol := range fieldMap {
+		if val, ok := input[jsonKey]; ok {
+			if jsonKey == "analysis_sample" {
+				raw, ok := val.([]interface{})
+				if !ok {
+					return nil, apperrors.BadRequest("analysis_sample must be an array")
+				}
+				strs := make([]string, len(raw))
+				for i, v := range raw {
+					strs[i] = fmt.Sprintf("%v", v)
+				}
+				setClauses = append(setClauses, fmt.Sprintf("%s = $%d", dbCol, argIdx))
+				args = append(args, pq.Array(strs))
+			} else {
+				setClauses = append(setClauses, fmt.Sprintf("%s = $%d", dbCol, argIdx))
+				args = append(args, val)
+			}
+			argIdx++
+		}
+	}
+
+	if len(setClauses) == 0 {
+		return nil, apperrors.BadRequest("no fields to update")
+	}
+
+	// Sempre atualiza o updated_at com o horário atual
+	setClauses = append(setClauses, fmt.Sprintf("updated_at_sample = $%d", argIdx))
+	args = append(args, time.Now())
+	argIdx++
+
+	args = append(args, id_sample)
+
+	query := fmt.Sprintf(`
+        UPDATE samples SET %s
+        WHERE id_sample = $%d
+        RETURNING id_sample, name_sample, sector_sample, analysis_sample,
+                  created_by_user_id_sample, created_at_sample, updated_at_sample,
+                  deleted_at_sample, is_active_sample
+    `, strings.Join(setClauses, ", "), argIdx)
+
+	var sample models.SampleModel
+	err := sr.connection.QueryRow(query, args...).Scan(
+		&sample.ID,
+		&sample.Name,
+		&sample.Sector,
+		pq.Array(&sample.Analysis),
+		&sample.CreatedByUserID,
+		&sample.CreatedAt,
+		&sample.UpdatedAt,
+		&sample.DeletedAt,
+		&sample.IsActive,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, apperrors.NotFound("sample not found")
+		}
+		return nil, apperrors.Internal("failed to update sample")
+	}
+
+	return &sample, nil
 }

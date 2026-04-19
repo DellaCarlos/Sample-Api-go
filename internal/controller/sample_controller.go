@@ -21,7 +21,6 @@ func NewSampleController(usecase usecase.SampleUseCase) *SampleController {
 	}
 }
 
-// função que trata a requisição de obtenção de produtos (get)
 func (s *SampleController) GetSamples(ctx *gin.Context) {
 	samples, err := s.sampleUseCase.GetSamples()
 	if err != nil {
@@ -31,7 +30,6 @@ func (s *SampleController) GetSamples(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, samples)
 }
 
-// função que trata a requisição de obtenção de produtos (get)
 func (s *SampleController) GetSampleByID(ctx *gin.Context) {
 	id := ctx.Param("id_sample")
 	if id == "" {
@@ -60,7 +58,6 @@ func (s *SampleController) GetSampleByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, sample)
 }
 
-// função que trata a requisição de criação de produto (post)
 func (s *SampleController) CreateSample(ctx *gin.Context) {
 	var sample models.SampleModel
 	err := ctx.BindJSON(&sample)
@@ -122,4 +119,32 @@ func (s *SampleController) HardDeleteSampleByID(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, models.ResponseModel{Message: "removed " + id})
+}
+
+func (s *SampleController) UpdateSample(ctx *gin.Context) {
+	id := ctx.Param("id_sample")
+	if id == "" {
+		ctx.JSON(http.StatusBadRequest, apperrors.BadRequest("invalid id, must be not null"))
+		return
+	}
+
+	sampleId, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, apperrors.BadRequest("invalid id, must not be char"))
+		return
+	}
+
+	var input map[string]interface{}
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, apperrors.BadRequest("invalid body"))
+		return
+	}
+
+	updated, err := s.sampleUseCase.UpdateSample(sampleId, input)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, updated)
 }

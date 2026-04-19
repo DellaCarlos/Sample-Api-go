@@ -14,6 +14,7 @@ func Register(server *gin.Engine, sampleController *controllers.SampleController
 			samples.GET("", sampleController.GetSamples)
 			samples.GET("/:id_sample", sampleController.GetSampleByID)
 			samples.POST("", sampleController.CreateSample)
+			samples.PATCH("/:id_sample", sampleController.UpdateSample)
 			samples.DELETE("/d/:id_sample", sampleController.SoftDeleteSampleByID)
 			samples.DELETE("/hd/:id_sample", sampleController.HardDeleteSampleByID)
 		}
