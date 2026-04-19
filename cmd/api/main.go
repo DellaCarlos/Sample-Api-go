@@ -18,7 +18,7 @@ func main() {
 	// middleware
 	server.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:5173"}, // porta vite
-		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowMethods: []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders: []string{"Content-Type", "Authorization"},
 	}))
 
